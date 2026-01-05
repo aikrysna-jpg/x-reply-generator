@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Reply Generator - Multi Link & Quick Reply</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0f1419;
+            color: #e7e9ea;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #2f3336;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logo i {
+            font-size: 2.8rem;
+            color: #1d9bf0;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #1d9bf0, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .tagline {
+            color: #71767b;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .card {
+            background-color: #16181c;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid #2f3336;
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #e7e9ea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #e7e9ea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="url"], input[type="text"], textarea, select {
+            flex: 1;
+            padding: 15px 20px;
+            background-color: #212327;
+            border: 2px solid #2f3336;
+            border-radius: 12px;
+            color: #e7e9ea;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input[type="url"]:focus, input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #1d9bf0;
+        }
+
+        input[type="url"]::placeholder, input[type="text"]::placeholder, textarea::placeholder {
+            color: #71767b;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: monospace;
+            line-height: 1.5;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        button {
+            padding: 15px 25px;
+            background: linear-gradient(90deg, #1d9bf0, #8b5cf6);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(29, 155, 240, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            border-radius: 8px;
+        }
+
+        .loading {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            color: #1d9bf0;
+            font-weight: 600;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .copy-btn {
+            padding: 10px 20px;
+            background-color: #212327;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn:hover {
+            background-color: #2f3336;
+        }
+
+        .reply-container {
+            background-color: #212327;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid #1d9bf0;
+            white-space: pre-line;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .reply-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .action-btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quick-reply-btn {
+            background: linear-gradient(90deg, #00b894, #00cec9);
+        }
+
+        .quick-reply-btn:hover {
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
+        }
+
+        .generate-new {
+            background-color: transparent;
+            border: 2px solid #2f3336;
+        }
+
+        .generate-new:hover {
+            background-color: #212327;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .settings-section {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            background-color: #212327;
+        }
+
+        .api-status.connected {
+            background-color: rgba(0, 184, 148, 0.1);
+            color: #00b894;
+        }
+
+        .api-status.disconnected {
+            background-color: rgba(225, 112, 85, 0.1);
+            color: #e17055;
+        }
+
+        .examples {
+            margin-top: 10px;
+        }
+
+        .examples h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #e7e9ea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .example-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .example-link {
+            background-color: #212327;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #2f3336;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example-link:hover {
+            background-color: #2a2d32;
+            border-color: #1d9bf0;
+        }
+
+        .example-link .text {
+            font-size: 0.9rem;
+            color: #71767b;
+            margin-top: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .tone-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .tone-btn {
+            padding: 10px 16px;
+            background-color: #212327;
+            border-radius: 20px;
+            border: 1px solid #2f3336;
+            color: #e7e9ea;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .tone-btn:hover {
+            background-color: #2f3336;
+        }
+
+        .tone-btn.active {
+            background: linear-gradient(90deg, #1d9bf0, #8b5cf6);
+            border-color: transparent;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #2f3336;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(90deg, #1d9bf0, #8b5cf6);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .prompt-info {
+            font-size: 0.85rem;
+            color: #71767b;
+            margin-top: 5px;
+        }
+
+        .api-test-btn {
+            margin-top: 10px;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            background-color: #212327;
+        }
+
+        .api-test-btn:hover {
+            background-color: #2f3336;
+        }
+
+        .multi-links-section {
+            margin-top: 30px;
+        }
+
+        .multi-links-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .links-counter {
+            background-color: #2f3336;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .links-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .multi-links-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .multi-links-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .multi-links-container::-webkit-scrollbar-track {
+            background: #212327;
+            border-radius: 4px;
+        }
+
+        .multi-links-container::-webkit-scrollbar-thumb {
+            background: #2f3336;
+            border-radius: 4px;
+        }
+
+        .multi-links-container::-webkit-scrollbar-thumb:hover {
+            background: #1d9bf0;
+        }
+
+        .link-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background-color: #212327;
+            border-radius: 10px;
+            border: 1px solid #2f3336;
+        }
+
+        .link-item input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #e7e9ea;
+            font-size: 0.95rem;
+            padding: 0;
+        }
+
+        .link-item input:focus {
+            outline: none;
+        }
+
+        .link-number {
+            background-color: #2f3336;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .link-actions {
+            display: flex;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .link-action-btn {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #2f3336;
+            border-radius: 6px;
+        }
+
+        .link-action-btn:hover {
+            background-color: #1d9bf0;
+        }
+
+        .remove-link-btn:hover {
+            background-color: #e17055;
+        }
+
+        .batch-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .batch-btn {
+            flex: 1;
+            padding: 12px;
+        }
+
+        .batch-btn i {
+            font-size: 1.2rem;
+        }
+
+        .links-textarea-container {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .links-textarea-container textarea {
+            width: 100%;
+            min-height: 150px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .view-toggle-btn {
+            padding: 8px 15px;
+            background-color: #212327;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .view-toggle-btn.active {
+            background: linear-gradient(90deg, #1d9bf0, #8b5cf6);
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .history-item {
+            background-color: #212327;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #2f3336;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            background-color: #2a2d32;
+            border-color: #1d9bf0;
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 30px 20px;
+            color: #71767b;
+            font-style: italic;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #2f3336;
+            color: #71767b;
+            font-size: 0.9rem;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            background-color: #16181c;
+            border: 1px solid #2f3336;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.show {
+            display: flex;
+        }
+
+        .notification.success {
+            border-left: 4px solid #00b894;
+        }
+
+        .notification.error {
+            border-left: 4px solid #e17055;
+        }
+
+        .notification.info {
+            border-left: 4px solid #1d9bf0;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .input-wrapper {
+                flex-direction: column;
+            }
+            
+            button {
+                justify-content: center;
+            }
+            
+            .reply-actions {
+                flex-direction: column;
+            }
+            
+            .links-controls {
+                flex-wrap: wrap;
+            }
+            
+            .batch-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fab fa-twitter"></i>
+                <div>
+                    <h1>Auto Reply Generator - Multi Link</h1>
+                    <p class="tagline">Generate balasan untuk satu atau banyak link X sekaligus</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="app-container">
+            <div class="main-content">
+                <section class="card input-section">
+                    <h2><i class="fas fa-link"></i> Single Link Generator</h2>
+                    <div class="input-group">
+                        <label for="tweet-url">Link Postingan X/Twitter</label>
+                        <div class="input-wrapper">
+                            <input type="url" id="tweet-url" placeholder="Contoh: https://x.com/username/status/1234567890" autocomplete="off">
+                            <button id="generate-btn">
+                                <i class="fas fa-bolt"></i> Generate
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="tone-selector">
+                        <label><i class="fas fa-palette"></i> Tone Balasan:</label>
+                        <div class="tone-options">
+                            <button class="tone-btn active" data-tone="default">Default</button>
+                            <button class="tone-btn" data-tone="formal">Formal</button>
+                            <button class="tone-btn" data-tone="casual">Kasual</button>
+                            <button class="tone-btn" data-tone="funny">Lucu</button>
+                            <button class="tone-btn" data-tone="supportive">Supportif</button>
+                            <button class="tone-btn" data-tone="critical">Kritis</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card multi-links-section">
+                    <div class="multi-links-header">
+                        <h2><i class="fas fa-layer-group"></i> Multi Links Manager (Maks: 20)</h2>
+                        <div class="links-counter" id="links-counter">0/20 links</div>
+                    </div>
+                    
+                    <div class="view-toggle">
+                        <button class="view-toggle-btn active" id="view-individual-btn">
+                            <i class="fas fa-list"></i> Input Individual
+                        </button>
+                        <button class="view-toggle-btn" id="view-bulk-btn">
+                            <i class="fas fa-file-alt"></i> Input Massal
+                        </button>
+                    </div>
+                    
+                    <div class="links-controls">
+                        <button class="btn-small" id="add-link-btn">
+                            <i class="fas fa-plus"></i> Tambah Link
+                        </button>
+                        <button class="btn-small" id="clear-links-btn">
+                            <i class="fas fa-trash"></i> Hapus Semua
+                        </button>
+                        <button class="btn-small" id="load-example-links-btn">
+                            <i class="fas fa-download"></i> Contoh Links
+                        </button>
+                    </div>
+                    
+                    <div class="multi-links-container" id="multi-links-container">
+                        <!-- Link items will be added here dynamically -->
+                    </div>
+                    
+                    <div class="links-textarea-container" id="links-textarea-container">
+                        <textarea id="bulk-links-textarea" placeholder="Tempel semua link di sini (satu link per baris). Maksimal 20 link.
+
+Contoh:
+https://x.com/username/status/1234567890
+https://x.com/anotheruser/status/9876543210
+https://x.com/technews/status/1122334455"></textarea>
+                    </div>
+                    
+                    <div class="batch-actions">
+                        <button class="batch-btn" id="generate-all-btn">
+                            <i class="fas fa-bolt"></i> Generate Semua
+                        </button>
+                        <button class="batch-btn" id="quick-reply-all-btn">
+                            <i class="fas fa-reply-all"></i> Quick Reply Semua
+                        </button>
+                    </div>
+                </section>
+
+                <div class="loading" id="loading-indicator">
+                    <i class="fas fa-spinner"></i>
+                    <span id="loading-text">Menganalisis link dan membuat balasan...</span>
+                </div>
+
+                <section class="card result-section" id="result-section">
+                    <div class="result-header">
+                        <h2><i class="fas fa-reply"></i> Balasan yang Dihasilkan</h2>
+                        <div>
+                            <button class="copy-btn" id="copy-btn">
+                                <i class="far fa-copy"></i> Salin
+                            </button>
+                            <button class="copy-btn" id="copy-all-btn" style="margin-left: 10px;">
+                                <i class="fas fa-copy"></i> Salin Semua
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="reply-container" id="reply-text">
+                    </div>
+                    
+                    <div class="reply-actions">
+                        <button class="action-btn quick-reply-btn" id="quick-reply-btn">
+                            <i class="fas fa-paper-plane"></i> Quick Reply ke X
+                        </button>
+                        <button class="action-btn" id="tweet-btn">
+                            <i class="fab fa-twitter"></i> Buka di X
+                        </button>
+                        <button class="action-btn generate-new" id="regenerate-btn">
+                            <i class="fas fa-redo"></i> Generate Ulang
+                        </button>
+                    </div>
+                </section>
+
+                <section class="card" id="batch-results-section" style="display: none;">
+                    <div class="result-header">
+                        <h2><i class="fas fa-tasks"></i> Hasil Batch Generation</h2>
+                        <button class="copy-btn" id="copy-batch-results-btn">
+                            <i class="fas fa-copy"></i> Salin Semua
+                        </button>
+                    </div>
+                    
+                    <div id="batch-results-container">
+                        <!-- Batch results will be added here -->
+                    </div>
+                </section>
+            </div>
+
+            <div class="sidebar">
+                <section class="card settings-section">
+                    <h2><i class="fas fa-cog"></i> Settings & API</h2>
+                    
+                    <div class="api-status disconnected" id="api-status">
+                        <i class="fas fa-plug"></i>
+                        <span>DeepSeek API: Tidak Terhubung</span>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <div class="setting-row">
+                            <label for="api-toggle">Gunakan DeepSeek API</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="api-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="prompt-info">
+                            Jika dinonaktifkan, akan menggunakan generator lokal
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group" id="api-settings">
+                        <label for="api-key">API Key DeepSeek</label>
+                        <input type="text" id="api-key" placeholder="Masukkan API Key Anda" autocomplete="off">
+                        <div class="prompt-info">
+                            Dapatkan API key dari <a href="https://platform.deepseek.com/api_keys" target="_blank" style="color: #1d9bf0;">platform.deepseek.com</a>
+                        </div>
+                        
+                        <label for="api-model" style="margin-top: 15px;">Model</label>
+                        <select id="api-model">
+                            <option value="deepseek-chat">deepseek-chat</option>
+                            <option value="deepseek-coder">deepseek-coder</option>
+                        </select>
+                        
+                        <button class="api-test-btn" id="test-api-btn">
+                            <i class="fas fa-vial"></i> Test Koneksi API
+                        </button>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label for="custom-prompt">Prompt Kustom</label>
+                        <textarea id="custom-prompt" placeholder="Tulis prompt kustom untuk mengatur pola balasan...">Buatkan balasan untuk postingan X/Twitter dengan tone {tone}. Balasan harus singkat, relevan, dan natural seperti manusia. Gunakan bahasa Indonesia yang baik dan sesuaikan dengan konteks postingan. Tambahkan 1-2 hashtag yang relevan di akhir. Maksimal {maxLength} karakter.</textarea>
+                        <div class="prompt-info">
+                            Gunakan <code>{tone}</code> untuk tone, <code>{maxLength}</code> untuk panjang maksimal
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label for="max-length">Panjang Maksimal Balasan</label>
+                        <div class="setting-row">
+                            <input type="range" id="max-length" min="50" max="500" value="200" step="10">
+                            <span id="length-value">200 karakter</span>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <div class="setting-row">
+                            <label for="auto-copy">Auto Copy ke Clipboard</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="auto-copy">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="prompt-info">
+                            Otomatis menyalin balasan setelah digenerate
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="card">
+                    <div class="multi-links-header">
+                        <h2><i class="fas fa-history"></i> Riwayat Balasan</h2>
+                        <button class="btn-small" id="clear-history-btn">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="history-list" id="history-list">
+                        <div class="history-empty">Belum ada riwayat</div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <footer>
+            <p>Auto Reply Generator dengan Multi-Link Support &copy; 2023</p>
+            <p>Website ini tidak berafiliasi dengan X Corp. atau DeepSeek.</p>
+        </footer>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <div id="notification-message">Pesan notifikasi</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const tweetUrlInput = document.getElementById('tweet-url');
+            const generateBtn = document.getElementById('generate-btn');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const loadingText = document.getElementById('loading-text');
+            const resultSection = document.getElementById('result-section');
+            const replyText = document.getElementById('reply-text');
+            const copyBtn = document.getElementById('copy-btn');
+            const copyAllBtn = document.getElementById('copy-all-btn');
+            const quickReplyBtn = document.getElementById('quick-reply-btn');
+            const tweetBtn = document.getElementById('tweet-btn');
+            const regenerateBtn = document.getElementById('regenerate-btn');
+            const toneButtons = document.querySelectorAll('.tone-btn');
+            
+            // Multi-links elements
+            const multiLinksContainer = document.getElementById('multi-links-container');
+            const linksCounter = document.getElementById('links-counter');
+            const addLinkBtn = document.getElementById('add-link-btn');
+            const clearLinksBtn = document.getElementById('clear-links-btn');
+            const loadExampleLinksBtn = document.getElementById('load-example-links-btn');
+            const generateAllBtn = document.getElementById('generate-all-btn');
+            const quickReplyAllBtn = document.getElementById('quick-reply-all-btn');
+            const viewIndividualBtn = document.getElementById('view-individual-btn');
+            const viewBulkBtn = document.getElementById('view-bulk-btn');
+            const linksTextareaContainer = document.getElementById('links-textarea-container');
+            const bulkLinksTextarea = document.getElementById('bulk-links-textarea');
+            
+            // Batch results
+            const batchResultsSection = document.getElementById('batch-results-section');
+            const batchResultsContainer = document.getElementById('batch-results-container');
+            const copyBatchResultsBtn = document.getElementById('copy-batch-results-btn');
+            
+            // Settings elements
+            const apiStatus = document.getElementById('api-status');
+            const apiToggle = document.getElementById('api-toggle');
+            const apiSettings = document.getElementById('api-settings');
+            const apiKeyInput = document.getElementById('api-key');
+            const apiModelSelect = document.getElementById('api-model');
+            const testApiBtn = document.getElementById('test-api-btn');
+            const customPromptTextarea = document.getElementById('custom-prompt');
+            const maxLengthSlider = document.getElementById('max-length');
+            const lengthValue = document.getElementById('length-value');
+            const autoCopyToggle = document.getElementById('auto-copy');
+            const historyList = document.getElementById('history-list');
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
+            
+            // Notification
+            const notification = document.getElementById('notification');
+            const notificationMessage = document.getElementById('notification-message');
+            
+            // State
+            let currentTone = 'default';
+            let currentTweetUrl = '';
+            let currentReply = '';
+            let replyHistory = [];
+            let useDeepSeekAPI = false;
+            let apiKey = '';
+            let links = [];
+            let batchResults = [];
+            let isBatchProcessing = false;
+            let currentViewMode = 'individual'; // 'individual' or 'bulk'
+            
+            // Initialize
+            loadSettings();
+            loadHistory();
+            loadLinks();
+            updateApiSettingsVisibility();
+            updateLinksCounter();
+            renderLinks();
+            
+            // Event Listeners
+            generateBtn.addEventListener('click', () => generateReplyForSingle());
+            copyBtn.addEventListener('click', copyReply);
+            copyAllBtn.addEventListener('click', copyAllReplies);
+            quickReplyBtn.addEventListener('click', quickReply);
+            tweetBtn.addEventListener('click', openTweet);
+            regenerateBtn.addEventListener('click', regenerateReply);
+            
+            // Multi-links event listeners
+            addLinkBtn.addEventListener('click', addEmptyLink);
+            clearLinksBtn.addEventListener('click', clearAllLinks);
+            loadExampleLinksBtn.addEventListener('click', loadExampleLinks);
+            generateAllBtn.addEventListener('click', generateAllReplies);
+            quickReplyAllBtn.addEventListener('click', quickReplyAll);
+            viewIndividualBtn.addEventListener('click', () => switchViewMode('individual'));
+            viewBulkBtn.addEventListener('click', () => switchViewMode('bulk'));
+            bulkLinksTextarea.addEventListener('input', updateLinksFromBulkTextarea);
+            
+            // Batch results
+            copyBatchResultsBtn.addEventListener('click', copyBatchResults);
+            
+            // Settings event listeners
+            apiToggle.addEventListener('change', function() {
+                useDeepSeekAPI = this.checked;
+                updateApiSettingsVisibility();
+                saveSettings();
+            });
+            
+            apiKeyInput.addEventListener('input', function() {
+                apiKey = this.value;
+                saveSettings();
+            });
+            
+            apiModelSelect.addEventListener('change', saveSettings);
+            customPromptTextarea.addEventListener('input', saveSettings);
+            maxLengthSlider.addEventListener('input', updateLengthValue);
+            autoCopyToggle.addEventListener('change', saveSettings);
+            testApiBtn.addEventListener('click', testApiConnection);
+            clearHistoryBtn.addEventListener('click', clearHistory);
+            
+            // Tone buttons
+            toneButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    toneButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentTone = this.getAttribute('data-tone');
+                });
+            });
+            
+            // Enter key to generate
+            tweetUrlInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    generateReplyForSingle();
+                }
+            });
+            
+            // Functions
+            function updateLengthValue() {
+                const value = maxLengthSlider.value;
+                lengthValue.textContent = `${value} karakter`;
+                saveSettings();
+            }
+            
+            function updateApiSettingsVisibility() {
+                if (useDeepSeekAPI) {
+                    apiSettings.style.display = 'block';
+                    apiStatus.classList.remove('disconnected');
+                    apiStatus.classList.add('connected');
+                    apiStatus.innerHTML = '<i class="fas fa-plug"></i><span>DeepSeek API: Siap Digunakan</span>';
+                } else {
+                    apiSettings.style.display = 'none';
+                    apiStatus.classList.remove('connected');
+                    apiStatus.classList.add('disconnected');
+                    apiStatus.innerHTML = '<i class="fas fa-plug"></i><span>DeepSeek API: Tidak Terhubung</span>';
+                }
+            }
+            
+            function switchViewMode(mode) {
+                currentViewMode = mode;
+                
+                if (mode === 'individual') {
+                    viewIndividualBtn.classList.add('active');
+                    viewBulkBtn.classList.remove('active');
+                    multiLinksContainer.style.display = 'flex';
+                    linksTextareaContainer.style.display = 'none';
+                    
+                    // Update textarea from links array
+                    updateBulkTextareaFromLinks();
+                } else {
+                    viewIndividualBtn.classList.remove('active');
+                    viewBulkBtn.classList.add('active');
+                    multiLinksContainer.style.display = 'none';
+                    linksTextareaContainer.style.display = 'block';
+                }
+            }
+            
+            // Link Management Functions
+            function addEmptyLink() {
+                if (links.length >= 20) {
+                    showNotification('Maksimal 20 link yang dapat ditambahkan', 'error');
+                    return;
+                }
+                
+                links.push('');
+                saveLinks();
+                renderLinks();
+                updateLinksCounter();
+            }
+            
+            function addLink(url) {
+                if (links.length >= 20) {
+                    showNotification('Maksimal 20 link yang dapat ditambahkan', 'error');
+                    return false;
+                }
+                
+                if (url && isValidTwitterUrl(url)) {
+                    links.push(url);
+                    saveLinks();
+                    renderLinks();
+                    updateLinksCounter();
+                    return true;
+                }
+                return false;
+            }
+            
+            function removeLink(index) {
+                links.splice(index, 1);
+                saveLinks();
+                renderLinks();
+                updateLinksCounter();
+            }
+            
+            function updateLink(index, url) {
+                if (isValidTwitterUrl(url) || url === '') {
+                    links[index] = url;
+                    saveLinks();
+                    updateLinksCounter();
+                }
+            }
+            
+            function clearAllLinks() {
+                if (links.length === 0) return;
+                
+                if (confirm(`Apakah Anda yakin ingin menghapus semua ${links.length} link?`)) {
+                    links = [];
+                    saveLinks();
+                    renderLinks();
+                    updateLinksCounter();
+                    showNotification('Semua link telah dihapus', 'success');
+                }
+            }
+            
+            function loadExampleLinks() {
+                const exampleLinks = [
+                    'https://x.com/Twitter/status/1681300457703051264',
+                    'https://x.com/NASA/status/1678780256185004032',
+                    'https://x.com/YouTube/status/1677170401277407234',
+                    'https://x.com/vercel/status/1681027940727373825',
+                    'https://x.com/github/status/1678738343443542016'
+                ];
+                
+                let addedCount = 0;
+                exampleLinks.forEach(link => {
+                    if (addLink(link)) {
+                        addedCount++;
+                    }
+                });
+                
+                showNotification(`${addedCount} link contoh telah ditambahkan`, 'success');
+            }
+            
+            function updateLinksFromBulkTextarea() {
+                const text = bulkLinksTextarea.value;
+                const urlList = text.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0)
+                    .slice(0, 20); // Limit to 20 links
+                
+                // Validate and keep only valid Twitter URLs
+                links = urlList.filter(url => isValidTwitterUrl(url) || url === '');
+                saveLinks();
+                updateLinksCounter();
+                
+                // If in individual view, re-render
+                if (currentViewMode === 'individual') {
+                    renderLinks();
+                }
+            }
+            
+            function updateBulkTextareaFromLinks() {
+                bulkLinksTextarea.value = links.filter(link => link.trim().length > 0).join('\n');
+            }
+            
+            function renderLinks() {
+                multiLinksContainer.innerHTML = '';
+                
+                links.forEach((link, index) => {
+                    const linkItem = document.createElement('div');
+                    linkItem.className = 'link-item';
+                    
+                    linkItem.innerHTML = `
+                        <div class="link-number">${index + 1}</div>
+                        <input type="url" class="link-input" value="${link}" 
+                               placeholder="https://x.com/username/status/..." 
+                               data-index="${index}">
+                        <div class="link-actions">
+                            <button class="link-action-btn use-link-btn" data-index="${index}" title="Gunakan link ini">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button class="link-action-btn remove-link-btn" data-index="${index}" title="Hapus link">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    multiLinksContainer.appendChild(linkItem);
+                    
+                    // Add event listeners for this link item
+                    const linkInput = linkItem.querySelector('.link-input');
+                    const useLinkBtn = linkItem.querySelector('.use-link-btn');
+                    const removeLinkBtn = linkItem.querySelector('.remove-link-btn');
+                    
+                    linkInput.addEventListener('change', function() {
+                        updateLink(index, this.value);
+                    });
+                    
+                    linkInput.addEventListener('blur', function() {
+                        updateLink(index, this.value);
+                    });
+                    
+                    useLinkBtn.addEventListener('click', function() {
+                        tweetUrlInput.value = link;
+                        currentTweetUrl = link;
+                        tweetUrlInput.focus();
+                        showNotification(`Link #${index + 1} telah dimuat ke input utama`, 'info');
+                    });
+                    
+                    removeLinkBtn.addEventListener('click', function() {
+                        removeLink(index);
+                    });
+                });
+                
+                // Add empty message if no links
+                if (links.length === 0) {
+                    const emptyMessage = document.createElement('div');
+                    emptyMessage.className = 'history-empty';
+                    emptyMessage.textContent = 'Belum ada link. Tambahkan link atau gunakan input massal.';
+                    multiLinksContainer.appendChild(emptyMessage);
+                }
+            }
+            
+            function updateLinksCounter() {
+                const validLinks = links.filter(link => isValidTwitterUrl(link)).length;
+                linksCounter.textContent = `${validLinks}/${links.length} links`;
+                
+                // Disable batch buttons if no valid links
+                const hasValidLinks = validLinks > 0;
+                generateAllBtn.disabled = !hasValidLinks;
+                quickReplyAllBtn.disabled = !hasValidLinks;
+            }
+            
+            // Generation Functions
+            async function generateReplyForSingle() {
+                const url = tweetUrlInput.value.trim();
+                
+                if (!url) {
+                    showNotification('Silakan masukkan link postingan X/Twitter', 'error');
+                    tweetUrlInput.focus();
+                    return;
+                }
+                
+                if (!isValidTwitterUrl(url)) {
+                    showNotification('Link yang dimasukkan tidak valid. Contoh: https://x.com/username/status/1234567890', 'error');
+                    tweetUrlInput.focus();
+                    return;
+                }
+                
+                currentTweetUrl = url;
+                
+                // Show loading
+                loadingText.textContent = 'Menganalisis link dan membuat balasan...';
+                loadingIndicator.style.display = 'flex';
+                resultSection.style.display = 'none';
+                batchResultsSection.style.display = 'none';
+                generateBtn.disabled = true;
+                
+                try {
+                    const reply = await generateReply(url, currentTone);
+                    currentReply = reply;
+                    
+                    // Show result
+                    loadingIndicator.style.display = 'none';
+                    replyText.textContent = reply;
+                    resultSection.style.display = 'block';
+                    generateBtn.disabled = false;
+                    
+                    // Auto copy if enabled
+                    if (autoCopyToggle.checked) {
+                        copyToClipboard(reply);
+                    }
+                    
+                    // Add to history
+                    addToHistory(url, reply, 'single');
+                    
+                    // Scroll to result
+                    resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    
+                } catch (error) {
+                    console.error('Error generating reply:', error);
+                    loadingIndicator.style.display = 'none';
+                    generateBtn.disabled = false;
+                    
+                    // Fallback to local AI
+                    showNotification('API error, menggunakan generator lokal', 'error');
+                    const fallbackReply = generateWithLocalAI(url, currentTone);
+                    currentReply = fallbackReply;
+                    replyText.textContent = fallbackReply;
+                    resultSection.style.display = 'block';
+                    
+                    addToHistory(url, fallbackReply + ' [Fallback]', 'single');
+                }
+            }
+            
+            async function generateAllReplies() {
+                const validLinks = links.filter(link => isValidTwitterUrl(link));
+                
+                if (validLinks.length === 0) {
+                    showNotification('Tidak ada link valid untuk digenerate', 'error');
+                    return;
+                }
+                
+                if (isBatchProcessing) {
+                    showNotification('Sedang memproses batch...', 'info');
+                    return;
+                }
+                
+                isBatchProcessing = true;
+                generateAllBtn.disabled = true;
+                quickReplyAllBtn.disabled = true;
+                batchResults = [];
+                
+                // Show loading
+                loadingText.textContent = `Memproses ${validLinks.length} link...`;
+                loadingIndicator.style.display = 'flex';
+                resultSection.style.display = 'none';
+                batchResultsSection.style.display = 'none';
+                
+                // Process each link
+                for (let i = 0; i < validLinks.length; i++) {
+                    const link = validLinks[i];
+                    loadingText.textContent = `Memproses link ${i + 1} dari ${validLinks.length}...`;
+                    
+                    try {
+                        const reply = await generateReply(link, currentTone);
+                        batchResults.push({
+                            url: link,
+                            reply: reply,
+                            index: i + 1,
+                            success: true
+                        });
+                        
+                        // Add to history
+                        addToHistory(link, reply, 'batch');
+                        
+                    } catch (error) {
+                        console.error(`Error generating reply for link ${i + 1}:`, error);
+                        const fallbackReply = generateWithLocalAI(link, currentTone);
+                        batchResults.push({
+                            url: link,
+                            reply: fallbackReply,
+                            index: i + 1,
+                            success: false,
+                            error: 'Using fallback'
+                        });
+                        
+                        addToHistory(link, fallbackReply + ' [Fallback]', 'batch');
+                    }
+                    
+                    // Small delay to avoid rate limiting
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                // Show batch results
+                loadingIndicator.style.display = 'none';
+                displayBatchResults();
+                isBatchProcessing = false;
+                generateAllBtn.disabled = false;
+                quickReplyAllBtn.disabled = false;
+                
+                showNotification(`Berhasil menghasilkan ${batchResults.length} balasan`, 'success');
+            }
+            
+            function displayBatchResults() {
+                batchResultsContainer.innerHTML = '';
+                batchResultsSection.style.display = 'block';
+                
+                batchResults.forEach(result => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'history-item batch-result-item';
+                    
+                    const shortUrl = result.url.length > 50 ? result.url.substring(0, 50) + '...' : result.url;
+                    const statusBadge = result.success ? 
+                        '<span style="color:#00b894; font-size:0.8rem;">✓ Berhasil</span>' : 
+                        '<span style="color:#e17055; font-size:0.8rem;">✗ Fallback</span>';
+                    
+                    resultItem.innerHTML = `
+                        <div><strong>#${result.index}</strong> ${statusBadge}</div>
+                        <div style="font-size:0.9rem; color:#1d9bf0; margin:5px 0;">${shortUrl}</div>
+                        <div style="font-size:0.95rem; margin-top:8px; color:#e7e9ea;">${result.reply}</div>
+                        <div style="margin-top:10px; display:flex; gap:10px;">
+                            <button class="btn-small copy-batch-item-btn" data-reply="${encodeURIComponent(result.reply)}" style="font-size:0.8rem;">
+                                <i class="far fa-copy"></i> Salin
+                            </button>
+                            <button class="btn-small quick-reply-item-btn" data-url="${result.url}" data-reply="${encodeURIComponent(result.reply)}" style="font-size:0.8rem; background:#00b894;">
+                                <i class="fas fa-paper-plane"></i> Quick Reply
+                            </button>
+                        </div>
+                    `;
+                    
+                    batchResultsContainer.appendChild(resultItem);
+                });
+                
+                // Add event listeners for batch result items
+                document.querySelectorAll('.copy-batch-item-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const reply = decodeURIComponent(this.getAttribute('data-reply'));
+                        copyToClipboard(reply);
+                        showNotification('Balasan disalin ke clipboard', 'success');
+                    });
+                });
+                
+                document.querySelectorAll('.quick-reply-item-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const url = this.getAttribute('data-url');
+                        const reply = decodeURIComponent(this.getAttribute('data-reply'));
+                        openQuickReply(url, reply);
+                    });
+                });
+                
+                batchResultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            
+            async function generateReply(url, tone) {
+                if (useDeepSeekAPI && apiKey) {
+                    return await generateWithDeepSeekAPI(url, tone);
+                } else {
+                    return generateWithLocalAI(url, tone);
+                }
+            }
+            
+            async function generateWithDeepSeekAPI(url, tone) {
+                const maxLength = parseInt(maxLengthSlider.value);
+                let prompt = customPromptTextarea.value;
+                
+                // Replace placeholders
+                prompt = prompt.replace('{tone}', tone);
+                prompt = prompt.replace('{maxLength}', maxLength);
+                
+                // Add tweet URL context
+                const fullPrompt = `${prompt}\n\nURL Postingan: ${url}\n\nBalasan:`;
+                
+                const response = await fetch('https://api.deepseek.com/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: apiModelSelect.value,
+                        messages: [
+                            {
+                                role: "user",
+                                content: fullPrompt
+                            }
+                        ],
+                        max_tokens: maxLength,
+                        temperature: 0.7
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return data.choices[0].message.content.trim();
+            }
+            
+            function generateWithLocalAI(url, tone) {
+                // Local reply templates
+                const replyTemplates = {
+                    default: [
+                        "Menarik sekali! Saya setuju dengan pendapat ini. Memang penting untuk terus belajar dan beradaptasi dengan perubahan yang ada. #BelajarBareng",
+                        "Terima kasih telah berbagi informasi ini! Sangat bermanfaat dan menambah wawasan saya tentang topik tersebut. #SharingIsCaring",
+                        "Poin yang sangat bagus! Ini mengingatkan saya pada pengalaman serupa yang pernah saya alami sebelumnya. #InspirasiHarian"
+                    ],
+                    formal: [
+                        "Saya ingin menyampaikan apresiasi atas konten yang informatif ini. Pendekatan yang Anda sampaikan memberikan perspektif yang bernilai dalam memahami isu tersebut. #KontenEdukatif",
+                        "Berdasarkan informasi yang Anda bagikan, saya menemukan beberapa kesamaan dengan penelitian terkini di bidang tersebut. Terima kasih atas kontribusinya. #DiskusiIlmiah",
+                        "Ucapan terima kasih saya sampaikan atas kontribusi Anda dalam membagikan wawasan yang bermanfaat ini kepada komunitas. #BerbagiPengetahuan"
+                    ],
+                    casual: [
+                        "Wah, keren banget infonya! Gue juga ngerasain hal yang sama nih. Makasih udah share ya! #SantaiAsik",
+                        "Langsung save nih thread-nya! Bener-bener relevan sama kondisi sekarang. Good stuff bro! #GasPol",
+                        "Setuju banget! Gue pernah ngalamin hal mirip dan emang bener kayak yang lo bilang. Nice share! #AnakMuda"
+                    ],
+                    funny: [
+                        "Wkwkwk ini beneran terjadi ya? Kalau gitu kita sekeluarga dong! 😂 Tapi seriusan, thanks infonya! #NgakakAsik",
+                        "Hahaha langsung kebayang deh! Kocak banget tapi tetep informatif. Nice one! #HumorCerdas",
+                        "Ini nih yang bikin scroll timeline worth it! 😄 Jadi pengen nambahin cerita juga nih. #LucuBerfaedah"
+                    ],
+                    supportive: [
+                        "Hang in there! Saya percaya kamu bisa melewati ini. Terus semangat dan jangan lupa istirahat ya! #SemangatJuang",
+                        "Kamu tidak sendirian. Banyak yang mendukungmu termasuk saya. Semua akan baik-baik saja pada waktunya. #SupportSystem",
+                        "Langkah kecil setiap hari tetap membawa kemajuan. Aku bangga dengan perjuanganmu! #ProgressNotPerfection"
+                    ],
+                    critical: [
+                        "Ada beberapa poin yang menurut saya perlu diklarifikasi lebih lanjut. Apakah ada data pendukung untuk pernyataan tersebut? #DiskusiKritis",
+                        "Saya memiliki pandangan berbeda terkait hal ini. Menurut pengalaman saya, faktor lain juga perlu dipertimbangkan. #PerspektifLain",
+                        "Pendapat yang menarik, namun saya rasa ada aspek yang belum sepenuhnya tercover dalam analisis ini. #AnalisisMendalam"
+                    ]
+                };
+                
+                const replies = replyTemplates[tone] || replyTemplates.default;
+                const randomIndex = Math.floor(Math.random() * replies.length);
+                return replies[randomIndex];
+            }
+            
+            function isValidTwitterUrl(url) {
+                try {
+                    const urlObj = new URL(url);
+                    const hostname = urlObj.hostname;
+                    
+                    if (!(hostname.includes('twitter.com') || hostname.includes('x.com'))) {
+                        return false;
+                    }
+                    
+                    const pathParts = urlObj.pathname.split('/').filter(part => part);
+                    if (pathParts.length < 3 || pathParts[1] !== 'status') {
+                        return false;
+                    }
+                    
+                    const statusId = pathParts[2];
+                    if (!/^\d+$/.test(statusId)) {
+                        return false;
+                    }
+                    
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            }
+            
+            // Quick Reply Function - Opens Twitter reply with pre-filled text
+            function quickReply() {
+                if (!currentTweetUrl || !currentReply) {
+                    showNotification('Silakan generate balasan terlebih dahulu', 'error');
+                    return;
+                }
+                
+                openQuickReply(currentTweetUrl, currentReply);
+            }
+            
+            function quickReplyAll() {
+                const validLinks = links.filter(link => isValidTwitterUrl(link));
+                
+                if (validLinks.length === 0) {
+                    showNotification('Tidak ada link valid untuk quick reply', 'error');
+                    return;
+                }
+                
+                // For batch, we'll open the first one and show notification for others
+                const firstLink = validLinks[0];
+                
+                // Generate a generic reply for batch quick reply
+                const batchReply = `Saya setuju dengan pendapat ini! Sangat informatif dan relevan dengan konteks saat ini. #DiskusiProduktif`;
+                
+                openQuickReply(firstLink, batchReply);
+                
+                if (validLinks.length > 1) {
+                    showNotification(`Membuka quick reply untuk link pertama. ${validLinks.length - 1} link lainnya tersedia di daftar.`, 'info');
+                }
+            }
+            
+            function openQuickReply(url, replyText) {
+                // Twitter's reply URL structure
+                // We need to extract the tweet ID from the URL
+                try {
+                    const urlObj = new URL(url);
+                    const pathParts = urlObj.pathname.split('/').filter(part => part);
+                    const tweetId = pathParts[2];
+                    
+                    // Create Twitter reply URL with pre-filled text
+                    // Note: Twitter's reply URL structure may change
+                    const replyUrl = `https://twitter.com/intent/tweet?in_reply_to=${tweetId}&text=${encodeURIComponent(replyText)}`;
+                    
+                    window.open(replyUrl, '_blank');
+                } catch (error) {
+                    console.error('Error creating reply URL:', error);
+                    showNotification('Gagal membuat link reply. Buka tweet secara manual dan salin balasannya.', 'error');
+                }
+            }
+            
+            function copyReply() {
+                if (!currentReply) {
+                    showNotification('Tidak ada balasan untuk disalin', 'error');
+                    return;
+                }
+                
+                copyToClipboard(currentReply);
+            }
+            
+            function copyAllReplies() {
+                if (batchResults.length === 0) {
+                    // If no batch results, copy single reply
+                    copyReply();
+                    return;
+                }
+                
+                let allRepliesText = '';
+                batchResults.forEach((result, index) => {
+                    allRepliesText += `Balasan #${index + 1} untuk ${result.url}:\n`;
+                    allRepliesText += `${result.reply}\n\n`;
+                });
+                
+                copyToClipboard(allRepliesText.trim());
+                showNotification(`Semua ${batchResults.length} balasan disalin ke clipboard`, 'success');
+            }
+            
+            function copyBatchResults() {
+                if (batchResults.length === 0) {
+                    showNotification('Tidak ada hasil batch untuk disalin', 'error');
+                    return;
+                }
+                
+                copyAllReplies();
+            }
+            
+            function copyToClipboard(text) {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        showNotification('Berhasil disalin ke clipboard', 'success');
+                    })
+                    .catch(err => {
+                        console.error('Gagal menyalin: ', err);
+                        showNotification('Gagal menyalin teks', 'error');
+                    });
+            }
+            
+            function openTweet() {
+                if (currentTweetUrl) {
+                    window.open(currentTweetUrl, '_blank');
+                } else {
+                    showNotification('Silakan generate balasan terlebih dahulu', 'error');
+                }
+            }
+            
+            function regenerateReply() {
+                if (!currentTweetUrl) {
+                    showNotification('Silakan masukkan link terlebih dahulu', 'error');
+                    return;
+                }
+                generateReplyForSingle();
+            }
+            
+            async function testApiConnection() {
+                if (!apiKeyInput.value) {
+                    showNotification('Masukkan API Key terlebih dahulu', 'error');
+                    return;
+                }
+                
+                testApiBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+                testApiBtn.disabled = true;
+                
+                try {
+                    const response = await fetch('https://api.deepseek.com/models', {
+                        headers: {
+                            'Authorization': `Bearer ${apiKeyInput.value}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        showNotification('Koneksi API berhasil!', 'success');
+                        apiStatus.classList.remove('disconnected');
+                        apiStatus.classList.add('connected');
+                        apiStatus.innerHTML = '<i class="fas fa-plug"></i><span>DeepSeek API: Terhubung</span>';
+                    } else {
+                        throw new Error('API Response not OK');
+                    }
+                } catch (error) {
+                    console.error('API Test Error:', error);
+                    showNotification('Gagal terhubung ke API. Periksa API Key.', 'error');
+                    apiStatus.classList.remove('connected');
+                    apiStatus.classList.add('disconnected');
+                    apiStatus.innerHTML = '<i class="fas fa-plug"></i><span>DeepSeek API: Gagal Terhubung</span>';
+                } finally {
+                    testApiBtn.innerHTML = '<i class="fas fa-vial"></i> Test Koneksi API';
+                    testApiBtn.disabled = false;
+                }
+            }
+            
+            function addToHistory(url, reply, type) {
+                const historyItem = {
+                    id: Date.now(),
+                    url: url,
+                    reply: reply,
+                    tone: currentTone,
+                    timestamp: new Date().toLocaleString('id-ID'),
+                    source: useDeepSeekAPI && apiKey ? 'DeepSeek API' : 'Local AI',
+                    type: type
+                };
+                
+                replyHistory.unshift(historyItem);
+                if (replyHistory.length > 20) {
+                    replyHistory = replyHistory.slice(0, 20);
+                }
+                
+                saveHistory();
+                updateHistoryDisplay();
+            }
+            
+            function updateHistoryDisplay() {
+                if (replyHistory.length === 0) {
+                    historyList.innerHTML = '<div class="history-empty">Belum ada riwayat</div>';
+                    return;
+                }
+                
+                let html = '';
+                replyHistory.forEach(item => {
+                    const shortUrl = item.url.length > 40 ? item.url.substring(0, 40) + '...' : item.url;
+                    const shortReply = item.reply.length > 60 ? item.reply.substring(0, 60) + '...' : item.reply;
+                    const typeBadge = item.type === 'batch' ? 
+                        '<span style="font-size:0.7rem; background:#2f3336; padding:2px 6px; border-radius:4px; margin-left:5px;">Batch</span>' : '';
+                    
+                    html += `
+                        <div class="history-item" data-id="${item.id}">
+                            <div><strong>${item.timestamp}</strong> ${typeBadge}</div>
+                            <div class="text">${shortReply}</div>
+                            <div style="font-size:0.8rem; color:#1d9bf0; margin-top:5px;">${shortUrl}</div>
+                        </div>
+                    `;
+                });
+                
+                historyList.innerHTML = html;
+                
+                // Add click event to history items
+                document.querySelectorAll('.history-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const historyItem = replyHistory.find(item => item.id === id);
+                        if (historyItem) {
+                            tweetUrlInput.value = historyItem.url;
+                            currentTweetUrl = historyItem.url;
+                            replyText.textContent = historyItem.reply;
+                            currentReply = historyItem.reply;
+                            resultSection.style.display = 'block';
+                            batchResultsSection.style.display = 'none';
+                            
+                            // Set tone button
+                            toneButtons.forEach(btn => {
+                                btn.classList.remove('active');
+                                if (btn.getAttribute('data-tone') === historyItem.tone) {
+                                    btn.classList.add('active');
+                                    currentTone = historyItem.tone;
+                                }
+                            });
+                            
+                            showNotification('Riwayat dimuat', 'success');
+                        }
+                    });
+                });
+            }
+            
+            function clearHistory() {
+                if (replyHistory.length === 0) return;
+                
+                if (confirm(`Apakah Anda yakin ingin menghapus semua ${replyHistory.length} riwayat?`)) {
+                    replyHistory = [];
+                    saveHistory();
+                    updateHistoryDisplay();
+                    showNotification('Riwayat telah dihapus', 'success');
+                }
+            }
+            
+            function showNotification(message, type) {
+                notificationMessage.textContent = message;
+                notification.className = `notification ${type} show`;
+                
+                // Set icon based on type
+                const icon = notification.querySelector('i');
+                if (type === 'success') {
+                    icon.className = 'fas fa-check-circle';
+                } else if (type === 'error') {
+                    icon.className = 'fas fa-exclamation-circle';
+                } else {
+                    icon.className = 'fas fa-info-circle';
+                }
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Settings persistence
+            function saveSettings() {
+                const settings = {
+                    useDeepSeekAPI: useDeepSeekAPI,
+                    apiKey: apiKeyInput.value,
+                    apiModel: apiModelSelect.value,
+                    customPrompt: customPromptTextarea.value,
+                    maxLength: maxLengthSlider.value,
+                    autoCopy: autoCopyToggle.checked,
+                    currentTone: currentTone
+                };
+                localStorage.setItem('xReplyGeneratorSettings', JSON.stringify(settings));
+            }
+            
+            function loadSettings() {
+                const saved = localStorage.getItem('xReplyGeneratorSettings');
+                if (saved) {
+                    try {
+                        const settings = JSON.parse(saved);
+                        useDeepSeekAPI = settings.useDeepSeekAPI || false;
+                        apiToggle.checked = useDeepSeekAPI;
+                        apiKeyInput.value = settings.apiKey || '';
+                        apiKey = settings.apiKey || '';
+                        apiModelSelect.value = settings.apiModel || 'deepseek-chat';
+                        customPromptTextarea.value = settings.customPrompt || '';
+                        maxLengthSlider.value = settings.maxLength || 200;
+                        lengthValue.textContent = `${maxLengthSlider.value} karakter`;
+                        autoCopyToggle.checked = settings.autoCopy || false;
+                        currentTone = settings.currentTone || 'default';
+                        
+                        // Set active tone button
+                        toneButtons.forEach(btn => {
+                            if (btn.getAttribute('data-tone') === currentTone) {
+                                btn.classList.add('active');
+                            } else {
+                                btn.classList.remove('active');
+                            }
+                        });
+                    } catch (e) {
+                        console.error('Error loading settings:', e);
+                    }
+                }
+            }
+            
+            function saveLinks() {
+                localStorage.setItem('xReplyGeneratorLinks', JSON.stringify(links));
+            }
+            
+            function loadLinks() {
+                const saved = localStorage.getItem('xReplyGeneratorLinks');
+                if (saved) {
+                    try {
+                        links = JSON.parse(saved) || [];
+                    } catch (e) {
+                        console.error('Error loading links:', e);
+                        links = [];
+                    }
+                }
+            }
+            
+            function saveHistory() {
+                localStorage.setItem('xReplyGeneratorHistory', JSON.stringify(replyHistory));
+            }
+            
+            function loadHistory() {
+                const saved = localStorage.getItem('xReplyGeneratorHistory');
+                if (saved) {
+                    try {
+                        replyHistory = JSON.parse(saved) || [];
+                        updateHistoryDisplay();
+                    } catch (e) {
+                        console.error('Error loading history:', e);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
